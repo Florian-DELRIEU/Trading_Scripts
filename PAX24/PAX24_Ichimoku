@@ -1,7 +1,7 @@
-//@version=5
-//script by Pax24
+//@version=5-A
+//script by Pax24 but modified by myself 
 
-indicator('Pax24 MTF Ichimoku','Pichi MTF', true)
+indicator('Pax24 H1/H4/D Ichimoku','Pichi MTF', true)
 
 // ——————————————————————————————————— CONFIGURATION  ———————————————————————————————————
 C00 = 'Original'
@@ -22,21 +22,21 @@ C14 = 'Yellow'
 C15 = 'White'
 
 group_base='Base parameters'
-conversionPeriods = input.int(9, minval=1, title='Conversion Line Periods', group=group_base, tooltip='Standard = 9, 26, 52, 26\nCrypto = 10, 30, 60, 30')
-basePeriods = input.int(26, minval=1, title='Base Line Periods', group=group_base)
+conversionPeriods = input.int(9, minval=1, title='Tenkan Periods', group=group_base, tooltip='Standard = 9, 26, 52, 26\nCrypto = 9, 26, 52, 26')
+basePeriods = input.int(26, minval=1, title='Kijun Periods', group=group_base)
 laggingSpan2Periods = input.int(52, minval=1, title='Lagging Span 2 Periods', group=group_base)
 displacement = input.int(26, minval=1, title='Displacement', group=group_base)
-group1='Ichimoku View'
-isActiveFirst = input(true, '──────── ichimoku ───────', group=group1, tooltip='Show or hide this ichimoku')
-isActiveFirstTenkan = input(true, 'Tenkan', group=group1, tooltip='Show or hide this Tenkan')
-isActiveFirstKijun = input(true, 'Kijun', group=group1, tooltip='Show or hide this Kijun')
-isActiveFirstChikou = input(true, 'Chikou', group=group1, tooltip='Show or hide this Chikou')
-isActiveFirstKumo = input(true, 'Kumo', group=group1, tooltip='Show or hide this Kumo')
+group1='Current Ichimoku'
+isActiveFirst = input(false, '──────── ichimoku ───────', group=group1, tooltip='Show or hide this ichimoku')
+isActiveFirstTenkan = input(false, 'Tenkan', group=group1, tooltip='Show or hide this Tenkan')
+isActiveFirstKijun = input(false, 'Kijun', group=group1, tooltip='Show or hide this Kijun')
+isActiveFirstChikou = input(false, 'Chikou', group=group1, tooltip='Show or hide this Chikou')
+isActiveFirstKumo = input(false, 'Kumo', group=group1, tooltip='Show or hide this Kumo')
 isActiveFirstLabel = input(false, 'Label', group=group1, tooltip='Show or hide this Label')
 labelFirstOffset = input.int(1, 'Offset', minval=0, maxval=20, inline='D', group=group1)
 labelFirstColor = input.string(C00, 'Color', options=[C00, C01, C02, C03, C04, C05, C06, C07, C08, C09, C10, C11, C12, C13, C14, C15], inline='D', group=group1,tooltip='Offset and color for this Label')
-group2='Ichimoku+1'
-isActiveSecond = input(true, '──────── ichimoku +1 ───────', group=group2)
+group2='Ichimoku H1'
+isActiveSecond = input(true, '──────── ichimoku H1 ───────', group=group2)
 isActiveSecondTenkan = input(false, 'Tenkan', group=group2)
 isActiveSecondKijun = input(true, 'Kijun', group=group2)
 isActiveSecondChikou = input(false, 'Chikou', group=group2)
@@ -44,8 +44,8 @@ isActiveSecondKumo = input(true, 'Kumo', group=group2)
 isActiveSecondLabel = input(true, 'Label', group=group2)
 labelSecondOffset = input.int(2, 'Offset', minval=0, maxval=20, inline='D', group=group2)
 labelSecondColor = input.string(C00, 'Color', options=[C00, C01, C02, C03, C04, C05, C06, C07, C08, C09, C10, C11, C12, C13, C14, C15], inline='D', group=group2)
-group3='Ichimoku+2'
-isActiveThird = input(true, '──────── ichimoku +2 ───────', group=group3)
+group3='ICHIMOKU H4'
+isActiveThird = input(true, '──────── ichimoku H4 ───────', group=group3)
 isActiveThirdTenkan = input(false, 'Tenkan', group=group3)
 isActiveThirdKijun = input(true, 'Kijun', group=group3)
 isActiveThirdChikou = input(false, 'Chikou', group=group3)
@@ -53,8 +53,8 @@ isActiveThirdKumo = input(true, 'Kumo', group=group3)
 isActiveThirdLabel = input(true, 'Label', group=group3)
 labelThirdOffset = input.int(3, 'Offset', minval=0, maxval=20, inline='D', group=group3)
 labelThirdColor = input.string(C00, 'Color', options=[C00, C01, C02, C03, C04, C05, C06, C07, C08, C09, C10, C11, C12, C13, C14, C15], inline='D', group=group3)
-group4='Ichimoku+3'
-isActiveFourth = input(true, '──────── ichimoku +3 ───────', group=group4)
+group4='Ichimoku Daily'
+isActiveFourth = input(true, '──────── ichimoku Daily ───────', group=group4)
 isActiveFourthTenkan = input(false, 'Tenkan', group=group4)
 isActiveFourthKijun = input(true, 'Kijun', group=group4)
 isActiveFourthChikou = input(false, 'Chikou', group=group4)
@@ -67,9 +67,9 @@ isActiveLabelAbbreviation = input(true, 'Label Abbreviation', group='Label', too
 
 changeIchi = input.bool(defval = false, title = "Fix Timeframe", group = "Timeframes", tooltip='Unchecked (default) = Adaptative ichimoku\nChecked = Fix the timeframe for each ichimoku')
 pIchi = input.timeframe("", '► ichimoku', group = "Timeframes")
-sIchi = input.timeframe("60", '► ichimoku+1', group = "Timeframes")
-tIchi = input.timeframe("240", '► ichimoku+2', group = "Timeframes")
-fIchi = input.timeframe("D", '► ichimoku+3', group = "Timeframes")
+sIchi = input.timeframe("H1", '► ichimoku H1', group = "Timeframes")
+tIchi = input.timeframe("H4", '► ichimoku H4', group = "Timeframes")
+fIchi = input.timeframe("D", '► ichimoku D0', group = "Timeframes")
 firstIchi = changeIchi ? pIchi : timeframe.period
 secondIchi = changeIchi ? sIchi : timeframe.period=="60" or timeframe.period=="120" or timeframe.period=="180" or timeframe.period=="240" or timeframe.period=="360" or timeframe.period=="720" ? "W" : timeframe.period=="D" ? "W" : "60"
 thirdIchi = changeIchi ? tIchi : timeframe.period=="1" or timeframe.period=="3" ? "5" : timeframe.period=="240" or timeframe.period=="360" or timeframe.period=="720" or timeframe.period=="D" or timeframe.period=="W" ? "M" : "240"
@@ -80,7 +80,7 @@ fourthIchi = changeIchi ? fIchi : timeframe.period=="1" or timeframe.period=="3"
 tenkanPeriods = conversionPeriods
 kijunPeriods = basePeriods
 SSBPeriods = laggingSpan2Periods
-displacementPeriods = displacement - 1
+displacementPeriods = displacement
 timeOffset = time - time[1]
 
 // ————————————————————————————————————— FUNCTION  ——————————————————————————————————————
